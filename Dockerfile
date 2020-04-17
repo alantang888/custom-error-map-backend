@@ -1,8 +1,8 @@
 FROM golang:1.14 as build
 
-WORKDIR /go/src/github.com/alantang888/always-error-401
+WORKDIR /go/src/github.com/alantang888/custom-error-map-backend
 COPY . .
-WORKDIR /go/src/github.com/alantang888/always-error-401/cmd/always-error-401
+WORKDIR /go/src/github.com/alantang888/custom-error-map-backend/cmd/custom-error-map-backend
 RUN go build -o /go/bin/app
 
 

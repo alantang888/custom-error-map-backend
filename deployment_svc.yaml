@@ -1,19 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-error-map-backend
+data:
+  error_mapping.yaml: >
+    error_mapping:
+      502: 401
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: always-401-backend
+  name: custom-error-map-backend
 spec:
   selector:
     matchLabels:
-      app: always-401-backend
+      app: custom-error-map-backend
   template:
     metadata:
       labels:
-        app: always-401-backend
+        app: custom-error-map-backend
     spec:
       containers:
-      - name: always-401-backend
-        image: alantang888/always-error-401:1.0.0
+      - name: custom-error-map-backend
+        image: alantang888/custom-error-map-backend:1.0.0
+        env:
+        - name: CONFIG_PATH
+          value: /config/error_mapping.yaml
         livenessProbe:
           failureThreshold: 3
           periodSeconds: 5
@@ -23,14 +36,21 @@ spec:
           timeoutSeconds: 2
         ports:
         - containerPort: 8080
+        volumeMounts:
+        - name: error-mapping
+          mountPath: /config
+      volumes:
+      - name: error-mapping
+        configMap:
+          name: custom-error-map-backend
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: always-401-backend
+  name: custom-error-map-backend
   labels:
-    app: always-401-backend
+    app: custom-error-map-backend
 spec:
   type: ClusterIP
   ports:
@@ -39,4 +59,4 @@ spec:
     targetPort: 8080
     protocol: TCP
   selector:
-    app: always-401-backend
+    app: custom-error-map-backend
